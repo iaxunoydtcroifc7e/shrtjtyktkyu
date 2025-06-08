@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <title>Music Player</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+@import url('https://fonts.googleapis.com/css?family=Poppins:800&display=swap');
+body, * {
+  font-family: 'Poppins', Arial, sans-serif !important;
+  font-weight: bold !important;
+  margin: 0;
+  color: #f5f5f5;
+}
+body {
+  background: #191919;
+  min-height: 100vh;
+}
+#points-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
+.point-dot {
+  position: absolute;
+  width: 5px; height: 5px;
+  background: #fff7;
+  border-radius: 50%;
+  box-shadow: 0 0 6px 1.5px #fff3;
+}
+.main-content {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 32px 0 60px 0;
+}
+.page-title-edit h2 {
+  font-size: 34px;
+  font-weight: 800;
+  color: #ececec;
+  text-align: center;
+  margin: 0 0 24px 0;
+}
+.music-area {
+  position: relative;
+  width: 500px;
+  min-height: 360px;
+  margin: 0 auto 36px auto;
+  background: rgba(50,50,50,0.84);
+  border: 2px solid #686868;
+  border-radius: 18px;
+  box-shadow: 0 4px 18px 0 rgba(0,0,0,0.08);
+  padding: 36px 32px 32px 32px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.album-art {
+  width: 144px;
+  height: 144px;
+  background: #222;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 4px 20px #0004;
+  object-fit: cover;
+  display: block;
+}
+.song-info {
+  text-align: center;
+  margin-bottom: 18px;
+}
+.song-title {
+  font-size: 24px;
+  color: #fff;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+.song-artist {
+  font-size: 16px;
+  color: #cccccc;
+  font-weight: 600;
+}
+.player-controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  margin: 20px 0;
+}
+.player-btn {
+  background: #333c;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 18px;
+  font-size: 22px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.2s, transform 0.15s;
+  margin: 0 3px;
+  font-family: inherit;
+  outline: none;
+}
+.player-btn:hover, .player-btn:focus {
+  background: #555d;
+  color: #fff;
+  transform: scale(1.08);
+}
+.progress-bar-area {
+  width: 100%;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+#progress-bar {
+  flex: 1;
+  appearance: none;
+  height: 6px;
+  background: #444;
+  border-radius: 6px;
+  outline: none;
+  accent-color: #ececec;
+}
+#progress-bar::-webkit-slider-thumb {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ececec;
+  box-shadow: 0 0 6px #fff7;
+  cursor: pointer;
+  border: none;
+}
+#progress-bar::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ececec;
+  box-shadow: 0 0 6px #fff7;
+  cursor: pointer;
+  border: none;
+}
+.time-label {
+  font-size: 13px;
+  color: #bbb;
+  min-width: 42px;
+  text-align: center;
+  font-weight: 700;
+  font-family: inherit;
+}
+footer {
+  width: 100%;
+  background: #1a1a1a;
+  padding: 10px 0;
+  text-align: center;
+  font-size: 14px;
+  color: #888;
+  border-top: 1px solid #222;
+  min-height: 36px;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  font-family: inherit;
+  font-weight: bold;
+}
+  </style>
+</head>
+<body>
+  <div id="points-bg"></div>
+  <div class="main-content">
+    <div class="page-title-edit">
+      <h2><u>Music Player</u></h2>
+    </div>
+    <div class="music-area" id="music-area">
+      <img class="album-art" id="album-art" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Iconic_image_of_a_musical_note.svg/512px-Iconic_image_of_a_musical_note.svg.png" alt="Album Art">
+      <div class="song-info">
+        <div class="song-title" id="song-title">Song Title</div>
+        <div class="song-artist" id="song-artist"></div>
+      </div>
+      <div class="progress-bar-area">
+        <span class="time-label" id="current-time">0:00</span>
+        <input type="range" id="progress-bar" value="0" min="0" max="100">
+        <span class="time-label" id="total-time">0:00</span>
+      </div>
+      <div class="player-controls">
+        <button class="player-btn" id="prev-btn" title="Previous">&#9198;</button>
+        <button class="player-btn" id="play-btn" title="Play">&#9658;</button>
+        <button class="player-btn" id="pause-btn" title="Pause" style="display:none">&#10073;&#10073;</button>
+        <button class="player-btn" id="next-btn" title="Next">&#9197;</button>
+      </div>
+      <select id="song-list" style="width:100%;margin-top:18px;padding:9px 8px;border-radius:6px;background:#222c;color:#fff;font-size:15px;font-family:inherit;font-weight:700;">
+      </select>
+      <audio id="audio" preload="metadata"></audio>
+    </div>
+  </div>
+  <footer>
+    Copyright © 2025 Music Player - Costin Edoardo
+  </footer>
+  <script>
+(function(){
+var POINTS_COUNT = 48;
+var points = [];
+function randomBetween(a, b) {return Math.random() * (b - a) + a;}
+function animatePoints() {
+  var w = window.innerWidth, h = window.innerHeight;
+  for (var i = 0; i < points.length; i++) {
+    var p = points[i];
+    p.vx += randomBetween(-0.012, 0.012);
+    p.vy += randomBetween(-0.012, 0.012);
+    p.vx = Math.max(-0.13, Math.min(0.13, p.vx));
+    p.vy = Math.max(-0.13, Math.min(0.13, p.vy));
+    p.x += p.vx;
+    p.y += p.vy;
+    if (p.x <= 0 || p.x >= w - 5) p.vx = -p.vx;
+    if (p.y <= 0 || p.y >= h - 5) p.vy = -p.vy;
+    p.x = Math.max(0, Math.min(p.x, w - 5));
+    p.y = Math.max(0, Math.min(p.y, h - 5));
+    p.dot.style.left = p.x + 'px';
+    p.dot.style.top = p.y + 'px';
+  }
+  requestAnimationFrame(animatePoints);
+}
+function initPoints() {
+  var container = document.getElementById('points-bg');
+  if (!container) return;
+  container.innerHTML = '';
+  var w = window.innerWidth, h = window.innerHeight;
+  points = [];
+  for (var i = 0; i < POINTS_COUNT; i++) {
+    var dot = document.createElement('div');
+    dot.className = 'point-dot';
+    var px = randomBetween(0, w - 5);
+    var py = randomBetween(0, h - 5);
+    dot.style.left = px + 'px';
+    dot.style.top = py + 'px';
+    container.appendChild(dot);
+    points.push({
+      x: px,
+      y: py,
+      vx: randomBetween(-0.08, 0.08),
+      vy: randomBetween(-0.08, 0.08),
+      dot: dot
+    });
+  }
+}
+window.addEventListener('resize', initPoints);
+initPoints();
+animatePoints();
+})();
+
+// Music player logic: expects 'songs/songs.json' (generated with a script).
+(function(){
+  const albumArt = document.getElementById("album-art");
+  const songTitle = document.getElementById("song-title");
+  const songArtist = document.getElementById("song-artist");
+  const songList = document.getElementById("song-list");
+  const audio = document.getElementById("audio");
+  const playBtn = document.getElementById("play-btn");
+  const pauseBtn = document.getElementById("pause-btn");
+  const prevBtn = document.getElementById("prev-btn");
+  const nextBtn = document.getElementById("next-btn");
+  const progressBar = document.getElementById("progress-bar");
+  const currentTimeLabel = document.getElementById("current-time");
+  const totalTimeLabel = document.getElementById("total-time");
+
+  const defaultCover = "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Iconic_image_of_a_musical_note.svg/512px-Iconic_image_of_a_musical_note.svg.png";
+
+  let songs = [];
+  let currentSong = 0;
+
+  function formatTime(sec) {
+    if (isNaN(sec)) return "0:00";
+    sec = Math.floor(sec);
+    let min = Math.floor(sec / 60);
+    let s = sec % 60;
+    return min + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  function loadSong(idx) {
+    if (!songs[idx]) return;
+    const song = songs[idx];
+    audio.src = song.src;
+    albumArt.src = song.cover || defaultCover;
+    songTitle.textContent = song.title;
+    songArtist.textContent = song.artist || "";
+    progressBar.value = 0;
+    progressBar.max = 100;
+    currentTimeLabel.textContent = "0:00";
+    totalTimeLabel.textContent = "0:00";
+    songList.value = idx;
+  }
+
+  function playSong() {
+    audio.play();
+    playBtn.style.display = "none";
+    pauseBtn.style.display = "inline-flex";
+  }
+  function pauseSong() {
+    audio.pause();
+    pauseBtn.style.display = "none";
+    playBtn.style.display = "inline-flex";
+  }
+
+  function prevSong() {
+    currentSong = (currentSong - 1 + songs.length) % songs.length;
+    loadSong(currentSong);
+    playSong();
+  }
+  function nextSong() {
+    currentSong = (currentSong + 1) % songs.length;
+    loadSong(currentSong);
+    playSong();
+  }
+
+  audio.addEventListener("loadedmetadata", function() {
+    totalTimeLabel.textContent = formatTime(audio.duration);
+    progressBar.max = Math.floor(audio.duration);
+  });
+
+  audio.addEventListener("timeupdate", function() {
+    progressBar.value = Math.floor(audio.currentTime);
+    currentTimeLabel.textContent = formatTime(audio.currentTime);
+  });
+
+  progressBar.addEventListener("input", function() {
+    audio.currentTime = progressBar.value;
+  });
+
+  audio.addEventListener("ended", nextSong);
+
+  playBtn.addEventListener("click", playSong);
+  pauseBtn.addEventListener("click", pauseSong);
+  prevBtn.addEventListener("click", prevSong);
+  nextBtn.addEventListener("click", nextSong);
+
+  songList.addEventListener("change", function() {
+    currentSong = parseInt(songList.value, 10);
+    loadSong(currentSong);
+    playSong();
+  });
+
+  // Load songs from songs.json generated by Node.js script
+  function fetchSongsJson() {
+    fetch('songs/songs.json')
+      .then(resp => resp.json())
+      .then(list => {
+        songs = list.map(song => ({
+          ...song,
+          src: song.src || ("songs/" + song.filename),
+          cover: song.cover || defaultCover
+        }));
+        populateSongList();
+        loadSong(currentSong);
+      })
+      .catch(() => {
+        songList.innerHTML = "<option>No songs found</option>";
+      });
+  }
+
+  function populateSongList() {
+    songList.innerHTML = "";
+    songs.forEach((song, idx) => {
+      const opt = document.createElement("option");
+      opt.value = idx;
+      opt.textContent = song.title || song.filename || ("Song " + (idx+1));
+      songList.appendChild(opt);
+    });
+  }
+
+  fetchSongsJson();
+})();
+  </script>
+</body>
+</html>
